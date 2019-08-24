@@ -3,14 +3,16 @@
 #include "Rivet/Projections/FastJets.hh"
 
 #include <vector>
+#include <TFile.h>
+#include <TTree.h>
 namespace Rivet {
 
 
-  class multiJet : public Analysis {
+  class multiJetReW : public Analysis {
   public:
 
-    multiJet()
-      : Analysis("multiJet")
+    multiJetReW()
+      : Analysis("multiJetReW")
     {    }
     float jr = 0.5; 
     int drBin = int(1.5-jr)*10;
@@ -23,6 +25,12 @@ namespace Rivet {
       _h2 = bookHisto1D("non_eta_high_pt_ldr_pt3_jet3_pt_jet2_pt", ptrBin);
       _h3 = bookHisto1D("non_eta_high_pt_dr_lpt3_del_r23", drBin,jr,1.5);
       _h4 = bookHisto1D("non_eta_high_pt_dr_hpt3_del_r23", drBin,jr,1.5);
+      rootOut = new TFile("multiJetNom.root", "RECREATE");
+      tr = new TTree("multiJetReW", "multiJetReW");
+      tr->Branch("evn", &evn, "evn/I");
+      tr->Branch("dR23", &dR23, "dR23/F");
+      tr->Branch("pTR", &pTR, "pTR/F");
+
     }
     void analyze(const Event& event) {
       const Jets& jets = applyProjection<FastJets>(event, "Jets").jetsByPt(30.0*GeV);
@@ -31,7 +39,6 @@ namespace Rivet {
       const FourMomentum jet2 = jets[1].momentum();
       const FourMomentum jet3 = jets[2].momentum();
       
-
       if (!inRange(jet1.pT(), 510*GeV,2500*GeV)) vetoEvent;
       if (jet1.absrapidity() > 2.5 || jet2.absrapidity() > 2.5) vetoEvent;
 
@@ -48,6 +55,10 @@ namespace Rivet {
       if (!inRange(del_r23, jr+0.1, 1.5)) vetoEvent;
 
       double w = event.weight();
+      evn = event.genEvent()->event_number();
+      dR23 = del_r23;
+      pTR = jet3_pt_jet2_pt;
+      tr->Fill();
       if (inRange(del_r23, jr+0.1,1.0)) _h1->fill(jet3_pt_jet2_pt, w);
       if (inRange(del_r23, 1.0,1.5)) _h2->fill(jet3_pt_jet2_pt, w);
       if (inRange(jet3_pt_jet2_pt, 0.1, 0.3)) _h3->fill(del_r23, w);
@@ -60,7 +71,10 @@ namespace Rivet {
     }
 
   private:
-
+    int evn;
+    float dR23, pTR;
+    TFile *rootOut;
+    TTree *tr; 
     Histo1DPtr  _h1;
     Histo1DPtr  _h2;
     Histo1DPtr  _h3;
@@ -68,6 +82,6 @@ namespace Rivet {
 
   };
 
-  DECLARE_RIVET_PLUGIN(multiJet);
+  DECLARE_RIVET_PLUGIN(multiJetReW);
 
 }
