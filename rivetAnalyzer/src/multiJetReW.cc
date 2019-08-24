@@ -15,16 +15,16 @@ namespace Rivet {
       : Analysis("multiJetReW")
     {    }
     float jr = 0.5; 
-    int drBin = int(1.5-jr)*10;
+    int drBin = 9;
     void init() {
       const FastJets jets(FinalState(-10, 10, 0.0*GeV), FastJets::ANTIKT, jr);
       addProjection(jets, "Jets");
       std::vector<double> ptrBin;
-      ptrBin.push_back(0.0);ptrBin.push_back(0.1);ptrBin.push_back(0.2);ptrBin.push_back(0.3);ptrBin.push_back(0.4);ptrBin.push_back(0.6);ptrBin.push_back(0.9);
+      ptrBin.push_back(0.1);ptrBin.push_back(0.2);ptrBin.push_back(0.3);ptrBin.push_back(0.4);ptrBin.push_back(0.6);ptrBin.push_back(0.9);
       _h1 = bookHisto1D("non_eta_high_pt_sdr_pt3_jet3_pt_jet2_pt", ptrBin);
       _h2 = bookHisto1D("non_eta_high_pt_ldr_pt3_jet3_pt_jet2_pt", ptrBin);
-      _h3 = bookHisto1D("non_eta_high_pt_dr_lpt3_del_r23", drBin,jr,1.5);
-      _h4 = bookHisto1D("non_eta_high_pt_dr_hpt3_del_r23", drBin,jr,1.5);
+      _h3 = bookHisto1D("non_eta_high_pt_dr_lpt3_del_r23", drBin,jr+0.1,1.5);
+      _h4 = bookHisto1D("non_eta_high_pt_dr_hpt3_del_r23", drBin,jr+0.1,1.5);
       rootOut = new TFile("multiJetNom.root", "RECREATE");
       tr = new TTree("multiJetReW", "multiJetReW");
       tr->Branch("evn", &evn, "evn/I");
@@ -34,11 +34,13 @@ namespace Rivet {
     }
     void analyze(const Event& event) {
       const Jets& jets = applyProjection<FastJets>(event, "Jets").jetsByPt(30.0*GeV);
+
       if (jets.size() < 3) vetoEvent;
+
       const FourMomentum jet1 = jets[0].momentum();
       const FourMomentum jet2 = jets[1].momentum();
       const FourMomentum jet3 = jets[2].momentum();
-      
+
       if (!inRange(jet1.pT(), 510*GeV,2500*GeV)) vetoEvent;
       if (jet1.absrapidity() > 2.5 || jet2.absrapidity() > 2.5) vetoEvent;
 
@@ -67,7 +69,9 @@ namespace Rivet {
 
 
     void finalize() {
-
+      tr->Write();
+      rootOut->Write();
+      rootOut->Close();
     }
 
   private:

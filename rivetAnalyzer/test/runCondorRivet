@@ -33,7 +33,7 @@ cd {cmsswSrc}
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 eval `scramv1 runtime -sh`
 cd $MYPWD
-cmsRun {cfg} {runNum}
+cmsRun {cfg} {runNum} {seed}
 tar cf {out} *.root *.yoda"""
 
   def setInPuts(self, inPut):
@@ -41,6 +41,9 @@ tar cf {out} *.root *.yoda"""
     self.tarBall_ = inPut[0]
     self.cfg_ = inPut[1]
     self.lhe_ = inPut[2]
+
+  def setSeedOffSet(self, seedOffSet):
+    self.seedOffSet_ = seedOffSet
 
   def setOutPuts(self, outPut):
     self.output_ = outPut
@@ -51,7 +54,7 @@ tar cf {out} *.root *.yoda"""
     shN = self.jobName_+"{:03}".format(jobNumber)
     out = "out{:03}.tar".format(jobNumber)
     tmpSh = open(shName, "w")
-    tmpSh.write(self.tmpSh_.format(**{'tarBall':self.tarBall_.split("/")[-1],'cmsswSrc':self.tarBall_.split("/")[-1].replace(".tar","/src"),'cfg':self.cfg_.split("/")[-1], 'runNum':jobNumber,'out':out}))
+    tmpSh.write(self.tmpSh_.format(**{'tarBall':self.tarBall_.split("/")[-1], 'cmsswSrc':self.tarBall_.split("/")[-1].replace(".tar","/src"), 'cfg':self.cfg_.split("/")[-1], 'runNum':jobNumber, 'seed':self.seedOffSet_, 'out':out}))
     tmpSh.close()
     tmpSub = open(subName, "w")
     tmpSub.write(self.tmpSub_.format(**{'sh':shName, 'shN':shN, 'tarBall':self.tarBall_, 'inputs':', '.join(self.input_).format(jobNumber), 'outputs':out}))
@@ -64,10 +67,12 @@ tar cf {out} *.root *.yoda"""
 if __name__ == "__main__" :
   iPath = os.getcwd()
   lhePath = "/xrootd_user/hyunyong/xrootd/POWHEG8TeV"
+  tarCommend = "tar -cf {tarBall} {cmssw} --exclude {src}" 
+  seedOffSet = sys.argv[2]
   cs = condorSubmiter(sys.argv[1])
-  cs.setInPuts([iPath+"/rivetRun.tar", iPath+"/QCD_powheg_v2_ct10_pytia8_cuetp8m1_rivet.py",lhePath+"/pwgeve_POWHEG2jet{:03}.lhe"]) 
-  seedOffSet = 1
+  cs.setSeedOffSet(seedOffSet)
+  cs.setInPuts([iPath+"/CMSSW_8_2_0.tar", iPath+"/QCD_powheg_v2_ct10_pytia8_cuetp8m1_rivet.py",lhePath+"/pwgeve_POWHEG2jet{:03}.lhe"]) 
   for i in range(300):
-    cs.submit(seedOffSet+i)
+    cs.submit(1+i)
 
 

@@ -16,6 +16,7 @@ process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 
 fNum = int(sys.argv[2])
+seedOffSet = int(sys.argv[3])
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
@@ -75,7 +76,13 @@ for path in process.paths:
 	getattr(process,path)._seq = process.generator * getattr(process,path)._seq 
 
 process.source.firstRun = cms.untracked.uint32(fNum)
-process.RandomNumberGeneratorService.generator.initialSeed = fNum
+process.RandomNumberGeneratorService.generator.initialSeed = seedOffSet + fNum
+#process.RandomNumberGeneratorService.generator.initialSeed = 700+fNum
+#process.RandomNumberGeneratorService.generator.initialSeed = 1300+fNum
+#process.RandomNumberGeneratorService.generator.initialSeed = 1600+fNum
+#process.RandomNumberGeneratorService.generator.initialSeed = 2600+fNum
+#process.RandomNumberGeneratorService.generator.initialSeed = 3300+fNum
+#process.RandomNumberGeneratorService.generator.initialSeed = 70691+fNum
 
 process.load('GeneratorInterface.RivetInterface.rivetAnalyzer_cfi')
 process.rivetAnalyzer.AnalysisNames = cms.vstring('multiJetReW')
