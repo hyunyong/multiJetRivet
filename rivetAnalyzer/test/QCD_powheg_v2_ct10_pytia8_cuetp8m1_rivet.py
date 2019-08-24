@@ -15,15 +15,15 @@ process.load('IOMC.EventVertexGenerators.VtxSmearedRealistic8TeVCollision_cfi')
 process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 
-f_num = int(sys.argv[2])
+fNum = int(sys.argv[2])
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(5000)
+    input = cms.untracked.int32(-1)
 )
 
 process.source = cms.Source("LHESource",
 			    fileNames = cms.untracked.vstring(
-			    'file:/xrootd_user/hyunyong/xrootd/POWHEG8TeV/pwgeve_POWHEG2jet001.lhe',
+			    'file:./pwgeve_POWHEG2jet{:03}.lhe'.format(fNum),
 							      )
                            )           
 
@@ -74,11 +74,11 @@ process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary
 for path in process.paths:
 	getattr(process,path)._seq = process.generator * getattr(process,path)._seq 
 
-process.source.firstRun = cms.untracked.uint32(f_num)
-process.RandomNumberGeneratorService.generator.initialSeed = f_num
+process.source.firstRun = cms.untracked.uint32(fNum)
+process.RandomNumberGeneratorService.generator.initialSeed = fNum
 
 process.load('GeneratorInterface.RivetInterface.rivetAnalyzer_cfi')
 process.rivetAnalyzer.AnalysisNames = cms.vstring('multiJetReW')
 process.generation_step+=process.rivetAnalyzer
-process.rivetAnalyzer.OutputFile = cms.string('QCD_powheg_ct10_pythia8_cuetp8m1_13TeV_rivet_%03d.yoda'%(f_num))
+process.rivetAnalyzer.OutputFile = cms.string('QCD_powheg_ct10_pythia8_cuetp8m1_13TeV_rivet_{:03}.yoda'.format(fNum))
 process.MessageLogger.cerr.FwkReport.reportEvery = 50000
