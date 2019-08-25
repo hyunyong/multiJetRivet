@@ -1,7 +1,7 @@
 # multiJetRivet
 
 ```
-scram p -n rivet CMSSW CMSSW_7_2_0
+scram p -n rivet CMSSW CMSSW_8_2_0
 cd rivet/src
 git clone git@github.com:hyunyong/multiJetRivet.git
 scram b -j8
