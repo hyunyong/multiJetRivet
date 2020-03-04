@@ -56,7 +56,10 @@ namespace Rivet {
 
 
     void finalize() {
-
+      scale(_h1, 1.0/_h1->effNumEntries());
+      scale(_h2, 1.0/_h2->effNumEntries());
+      scale(_h3, 1.0/_h3->effNumEntries());
+      scale(_h4, 1.0/_h4->effNumEntries());
     }
 
   private:

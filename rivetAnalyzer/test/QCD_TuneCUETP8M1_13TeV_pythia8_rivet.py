@@ -72,7 +72,7 @@ process.source.firstRun = cms.untracked.uint32(fNum)
 process.RandomNumberGeneratorService.generator.initialSeed = fNum
 
 process.load('GeneratorInterface.RivetInterface.rivetAnalyzer_cfi')
-process.rivetAnalyzer.AnalysisNames = cms.vstring('jetConstituents')
+process.rivetAnalyzer.AnalysisNames = cms.vstring('multiJet')
 #process.rivetAnalyzer.AnalysisNames = cms.vstring('multiJetReW')
 process.generation_step+=process.rivetAnalyzer
 process.rivetAnalyzer.OutputFile = cms.string('QCD_Pt_%dto%d_TuneCUETP8M1_13TeV_pythia8_rivet_%03d.yoda'%(minPt, maxPt, fNum))
